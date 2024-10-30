@@ -271,3 +271,17 @@
 .modal.show .modal-dialog {
     transform: scale(1);
 }
+
+/* Remover hover do card */
+.task-list li:hover {
+    /* Remover estas propriedades se existirem */
+    /* transform: translateY(-2px); */
+    /* box-shadow: var(--sombra-hover); */
+}
+
+/* Remover hover dos botões */
+.btn:hover {
+    /* Remover estas propriedades */
+    /* transform: translateY(-1px); */
+    /* box-shadow: var(--sombra-hover); */
+}

@@ -52,7 +52,29 @@ $(document).ready(function () {
 
     // Função para deletar usuário
     function deleteUser(id) {
-        if (confirm('Tem certeza que deseja excluir este usuário?')) {
+        // Configura o modal para confirmação de exclusão
+        const modal = document.getElementById('feedbackModal');
+        const modalTitle = modal.querySelector('#modalTitle');
+        const modalMessage = modal.querySelector('#modalMessage');
+        const modalHeader = modal.querySelector('.modal-header');
+        const modalFooter = modal.querySelector('.modal-footer');
+        
+        modalHeader.className = 'modal-header bg-danger text-white';
+        modalTitle.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>Confirmar Exclusão';
+        modalMessage.textContent = 'Tem certeza que deseja excluir este usuário?';
+        
+        // Substitui os botões do footer
+        modalFooter.innerHTML = `
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-danger" id="confirmDelete">Excluir</button>
+        `;
+        
+        // Mostra o modal
+        const feedbackModal = new bootstrap.Modal(modal);
+        feedbackModal.show();
+        
+        // Adiciona evento ao botão de confirmar
+        document.getElementById('confirmDelete').onclick = function() {
             $.ajax({
                 url: 'php/cadastrar_usuario.php',
                 type: 'POST',
@@ -62,19 +84,52 @@ $(document).ready(function () {
                 },
                 success: function(response) {
                     var result = JSON.parse(response);
+                    feedbackModal.hide(); // Esconde o modal de confirmação
+                    
                     if (result.success) {
-                        alert('Usuário excluído com sucesso!');
+                        showFeedback(true, 'Usuário excluído com sucesso!');
                         loadUsers();
                     } else {
-                        alert('Erro ao excluir: ' + result.error);
+                        showFeedback(false, 'Erro ao excluir: ' + result.error);
                     }
                 },
                 error: function(xhr, status, error) {
                     console.error("Erro ao excluir usuário:", error);
-                    alert('Erro ao excluir usuário. Tente novamente.');
+                    feedbackModal.hide();
+                    showFeedback(false, 'Erro ao excluir usuário. Tente novamente.');
                 }
             });
+        };
+    }
+
+    // Função para mostrar o modal de feedback
+    function showFeedback(success, message) {
+        const modal = document.getElementById('feedbackModal');
+        const modalTitle = modal.querySelector('#modalTitle');
+        const modalMessage = modal.querySelector('#modalMessage');
+        const modalHeader = modal.querySelector('.modal-header');
+        const modalFooter = modal.querySelector('.modal-footer');
+        
+        // Configura o estilo baseado no tipo de mensagem
+        if (success) {
+            modalHeader.className = 'modal-header bg-success text-white';
+            modalTitle.innerHTML = '<i class="bi bi-check-circle me-2"></i>Sucesso';
+            modalFooter.innerHTML = `
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
+            `;
+        } else {
+            modalHeader.className = 'modal-header bg-danger text-white';
+            modalTitle.innerHTML = '<i class="bi bi-exclamation-circle me-2"></i>Erro';
+            modalFooter.innerHTML = `
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">OK</button>
+            `;
         }
+        
+        modalMessage.textContent = message;
+        
+        // Mostra o modal
+        const feedbackModal = new bootstrap.Modal(modal);
+        feedbackModal.show();
     }
 
     // Manipula o envio do formulário
@@ -95,19 +150,19 @@ $(document).ready(function () {
             success: function (response) {
                 var result = JSON.parse(response);
                 if (result.success) {
-                    alert(editingId ? 'Usuário atualizado com sucesso!' : 'Usuário cadastrado com sucesso!');
+                    showFeedback(true, editingId ? 'Usuário atualizado com sucesso!' : 'Usuário cadastrado com sucesso!');
                     $('#user-form')[0].reset();
                     editingId = null;
                     $('button[type="submit"]').text('Cadastrar');
                     $('.card-header h1').text('Cadastro de Usuário');
                     loadUsers();
                 } else {
-                    alert('Erro: ' + result.error);
+                    showFeedback(false, 'Erro: ' + result.error);
                 }
             },
             error: function (xhr, status, error) {
                 console.error("Erro na operação:", error);
-                alert('Erro. Tente novamente.');
+                showFeedback(false, 'Erro ao realizar operação. Tente novamente.');
             }
         });
     });

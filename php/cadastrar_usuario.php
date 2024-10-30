@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } else {
                 $sql = "INSERT INTO usuarios (nome, email) VALUES ('$nome', '$email')";
                 if (mysqli_query($conn, $sql)) {
-                    echo json_encode(['success' => true]);
+                    echo json_encode(['success' => true, 'message' => 'Usuário cadastrado com sucesso!']);
                 } else {
                     echo json_encode(['success' => false, 'error' => mysqli_error($conn)]);
                 }
@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } else {
                 $sql = "UPDATE usuarios SET nome = '$nome', email = '$email' WHERE id_usuario = $id";
                 if (mysqli_query($conn, $sql)) {
-                    echo json_encode(['success' => true]);
+                    echo json_encode(['success' => true, 'message' => 'Usuário atualizado com sucesso!']);
                 } else {
                     echo json_encode(['success' => false, 'error' => mysqli_error($conn)]);
                 }
@@ -49,14 +49,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         case 'delete':
             $id = mysqli_real_escape_string($conn, $_POST['id']);
             
-            // Primeiro, atualiza as tarefas para remover a referência ao usuário
-            $update_tasks = "UPDATE tarefas SET id_usuario = NULL WHERE id_usuario = $id";
-            mysqli_query($conn, $update_tasks);
+            // Primeiro, verifica se o usuário tem tarefas associadas
+            $check_tasks = "SELECT COUNT(*) as total FROM tarefas WHERE id_usuario = $id";
+            $result = mysqli_query($conn, $check_tasks);
+            $row = mysqli_fetch_assoc($result);
+            
+            if ($row['total'] > 0) {
+                // Se houver tarefas, atualiza para remover a referência ao usuário
+                $update_tasks = "UPDATE tarefas SET id_usuario = NULL WHERE id_usuario = $id";
+                mysqli_query($conn, $update_tasks);
+            }
 
             // Depois, exclui o usuário
             $sql = "DELETE FROM usuarios WHERE id_usuario = $id";
             if (mysqli_query($conn, $sql)) {
-                echo json_encode(['success' => true]);
+                echo json_encode(['success' => true, 'message' => 'Usuário excluído com sucesso!']);
             } else {
                 echo json_encode(['success' => false, 'error' => mysqli_error($conn)]);
             }

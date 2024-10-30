@@ -163,7 +163,6 @@ button {
 
 button:hover {
     background-color: var(--cor-primaria-escura);
-    transform: translateY(-1px);
 }
 
 /* Responsividade comum */
