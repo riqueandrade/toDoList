@@ -39,23 +39,23 @@ if (!$result) {
 if (mysqli_num_rows($result) > 0) {
     // Loop através de cada tarefa encontrada
     while ($row = mysqli_fetch_assoc($result)) {
-        // Início do item da lista
+        // Cada tarefa é um <li> com classe card
         echo '<li class="card mb-3">';
         echo '<div class="card-body">';
         
-        // Cabeçalho com título e prioridade
+        // Cabeçalho da tarefa (título e prioridade)
         echo '<div class="d-flex justify-content-between align-items-center mb-2">';
         echo '<h5 class="card-title mb-0">' . htmlspecialchars($row['tarefa']) . '</h5>';
         echo '<span class="badge todo-priority priority-' . $row['prioridade'] . '">' 
             . ucfirst($row['prioridade']) . '</span>';
         echo '</div>';
         
-        // Descrição
+        // Descrição da tarefa
         if (!empty($row['descricao'])) {
             echo '<p class="card-text todo-description">' . htmlspecialchars($row['descricao']) . '</p>';
         }
         
-        // Informações adicionais
+        // Informações adicionais (setor, responsável, data)
         echo '<div class="mb-3">';
         if (!empty($row['setor'])) {
             echo '<p class="todo-sector mb-1"><i class="bi bi-building"></i> Setor: ' 
@@ -67,9 +67,28 @@ if (mysqli_num_rows($result) > 0) {
         } else {
             echo '<p class="todo-user mb-1"><i class="bi bi-person"></i> Responsável: Não atribuído</p>';
         }
-        echo '</div>';
         
-        // Botões
+        // Data de vencimento
+        if (!empty($row['data_vencimento'])) {
+            $data_vencimento = new DateTime($row['data_vencimento']);
+            $hoje = new DateTime();
+            $dias_restantes = $hoje->diff($data_vencimento)->days;
+            $classe_vencimento = '';
+            
+            if ($data_vencimento < $hoje) {
+                $classe_vencimento = 'text-danger';
+            } elseif ($dias_restantes <= 2) {
+                $classe_vencimento = 'text-warning';
+            }
+            
+            echo '<p class="todo-due-date mb-1 ' . $classe_vencimento . '">';
+            echo '<i class="bi bi-calendar-event"></i> Vence em: ' 
+                . $data_vencimento->format('d/m/Y');
+            echo '</p>';
+        }
+        echo '</div>'; // Fechando div das informações adicionais
+        
+        // Botões de ação
         echo '<div class="task-buttons">';
         if ($status !== 'Pronto') {
             echo '<button class="btn btn-primary move-btn me-2" data-id="' . $row['id_tarefas'] 

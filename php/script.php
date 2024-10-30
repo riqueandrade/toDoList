@@ -49,10 +49,12 @@ function adicionarTarefa($conn) {
     $prioridade = mysqli_real_escape_string($conn, $_POST['priority']);
     $id_usuario = mysqli_real_escape_string($conn, $_POST['user_id']);
     $status = "A Fazer";  // Garante que novas tarefas sejam adicionadas como "A Fazer"
+    $data_vencimento = mysqli_real_escape_string($conn, $_POST['due_date']);
 
     // Prepara a query SQL para inserir a nova tarefa
-    $sql = "INSERT INTO tarefas (tarefa, descricao, setor, prioridade, status, id_usuario) 
-            VALUES ('$tarefa', '$descricao', '$setor', '$prioridade', '$status', '$id_usuario')";
+    $sql = "INSERT INTO tarefas (tarefa, descricao, setor, prioridade, status, id_usuario, data_vencimento) 
+            VALUES ('$tarefa', '$descricao', '$setor', '$prioridade', '$status', '$id_usuario', " . 
+            ($data_vencimento ? "'$data_vencimento'" : "NULL") . ")";
     
     // Executa a query e verifica se foi bem-sucedida
     executarQuery($conn, $sql);
@@ -129,13 +131,15 @@ function atualizarTarefa($conn) {
     $setor = mysqli_real_escape_string($conn, $_POST['sector']);
     $prioridade = mysqli_real_escape_string($conn, $_POST['priority']);
     $id_usuario = mysqli_real_escape_string($conn, $_POST['user_id']);
+    $data_vencimento = mysqli_real_escape_string($conn, $_POST['due_date']);
 
     $sql = "UPDATE tarefas 
             SET tarefa = '$tarefa', 
                 descricao = '$descricao', 
                 setor = '$setor', 
                 prioridade = '$prioridade', 
-                id_usuario = '$id_usuario'
+                id_usuario = '$id_usuario',
+                data_vencimento = " . ($data_vencimento ? "'$data_vencimento'" : "NULL") . "
             WHERE id_tarefas = $id";
     
     executarQuery($conn, $sql);

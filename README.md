@@ -1,88 +1,122 @@
-# Lista de Tarefas Avançada
+# TaskHub - Sistema de Gerenciamento de Tarefas
 
-Este projeto é uma aplicação web de Lista de Tarefas (To-Do List) avançada, desenvolvida com HTML, CSS, JavaScript (jQuery) e PHP. Ela permite aos usuários adicionar, mover e excluir tarefas em três colunas diferentes: "A Fazer", "Fazendo" e "Pronto".
+TaskHub é uma aplicação web moderna para gerenciamento de tarefas em formato Kanban, desenvolvida com HTML, CSS, JavaScript (jQuery) e PHP. O sistema permite organizar tarefas em três estados diferentes: "A Fazer", "Fazendo" e "Pronto".
 
 ## Funcionalidades
 
-- Adicionar novas tarefas com título, descrição, setor e prioridade
-- Visualizar tarefas em três colunas diferentes (A Fazer, Fazendo, Pronto)
-- Mover tarefas entre as colunas
+### Gestão de Tarefas
+- Adicionar tarefas com título, descrição, setor e prioridade
+- Atribuir responsáveis às tarefas
+- Definir datas de vencimento
+- Mover tarefas entre colunas (A Fazer → Fazendo → Pronto)
+- Editar informações das tarefas
 - Excluir tarefas
-- Interface responsiva que se adapta a diferentes tamanhos de tela
+- Visualização em quadro Kanban
+
+### Gestão de Usuários
+- Cadastrar novos usuários
+- Editar informações de usuários
+- Excluir usuários
+- Visualizar lista de usuários cadastrados
+
+### Notificações
+- Alerta de tarefas próximas do vencimento (2 dias)
+- Indicadores visuais de prioridade
+- Destaque para tarefas atrasadas
+
+### Interface
+- Design responsivo com Bootstrap 5
+- Navegação intuitiva
+- Animações suaves
+- Ícones do Bootstrap Icons
+- Interface moderna e limpa
 
 ## Estrutura do Projeto
 
-- `index.html`: Página principal da aplicação
-- `style.css`: Estilos CSS para a interface do usuário
-- `app.js`: Lógica JavaScript/jQuery para interações do usuário e requisições AJAX
-- `script.php`: Script PHP para processar requisições do cliente (adicionar, mover, excluir tarefas)
-- `get_tasks.php`: Script PHP para buscar e exibir tarefas
-- `db_connection.php`: Configurações de conexão com o banco de dados
+### Frontend
+```
+├── index.html           # Página principal (Quadro Kanban)
+├── cadastro.html        # Página de gestão de usuários
+├── css/
+│   ├── common.css      # Estilos compartilhados
+│   ├── tasks.css       # Estilos do quadro de tarefas
+│   └── cadastro.css    # Estilos da página de usuários
+└── js/
+    ├── app.js          # Lógica do quadro de tarefas
+    ├── cadastro.js     # Lógica da gestão de usuários
+    └── nav.js          # Comportamento da navegação
+```
+
+### Backend
+```
+php/
+├── db_connection.php    # Configuração do banco de dados
+├── script.php          # Manipulação de tarefas (CRUD)
+├── cadastrar_usuario.php # Manipulação de usuários (CRUD)
+├── get_tasks.php       # API de busca de tarefas
+├── get_users.php       # API de busca de usuários
+└── check_notifications.php # Verificação de tarefas próximas do vencimento
+```
 
 ## Configuração
 
-1. Configure seu servidor web (como Apache) para servir os arquivos PHP.
+1. Configure seu servidor web (Apache/Nginx) para servir PHP
 2. Crie um banco de dados MySQL usando os seguintes comandos:
 
-   ```sql
-   CREATE DATABASE IF NOT EXISTS to_do_list
-   CHARACTER SET utf8mb4
-   COLLATE utf8mb4_unicode_ci;
+```sql
+CREATE DATABASE IF NOT EXISTS to_do_list
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
 
-   USE to_do_list;
+USE to_do_list;
 
-   CREATE TABLE usuarios (
-       id_usuario INT AUTO_INCREMENT PRIMARY KEY,
-       nome VARCHAR(255) NOT NULL,
-       email VARCHAR(255) NOT NULL UNIQUE,
-       data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-   );
+CREATE TABLE usuarios (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-   CREATE TABLE tarefas (
-       id_tarefas INT AUTO_INCREMENT PRIMARY KEY,
-       tarefa VARCHAR(255) NOT NULL,
-       descricao TEXT,
-       setor VARCHAR(100),
-       prioridade VARCHAR(10) NOT NULL,
-       status VARCHAR(20) NOT NULL,
-       id_usuario INT,
-       FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
-   );
-   ```
+CREATE TABLE tarefas (
+    id_tarefas INT AUTO_INCREMENT PRIMARY KEY,
+    tarefa VARCHAR(255) NOT NULL,
+    descricao TEXT,
+    setor VARCHAR(100),
+    prioridade VARCHAR(10) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    id_usuario INT,
+    data_vencimento DATE,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+);
+```
 
-3. Ajuste as credenciais do banco de dados no arquivo `db_connection.php` se necessário.
+3. Configure as credenciais do banco de dados em `php/db_connection.php`
 
-## Como Usar
+## Tecnologias Utilizadas
 
-1. Abra o `index.html` em seu navegador.
-2. Use o formulário no topo para adicionar novas tarefas.
-3. As tarefas aparecerão na coluna "A Fazer".
-4. Use os botões "Mover" para mover as tarefas entre as colunas.
-5. Use o botão "Excluir" para remover uma tarefa.
+- HTML5
+- CSS3
+- JavaScript/jQuery
+- PHP
+- MySQL
+- Bootstrap 5
+- Bootstrap Icons
 
-## Detalhes Técnicos
+## Segurança
 
-### Frontend (HTML/CSS/JavaScript)
-
-- O layout é criado usando HTML5 e estilizado com CSS3.
-- JavaScript (jQuery) é usado para manipulação do DOM e requisições AJAX.
-- A responsividade é alcançada usando media queries no CSS.
-
-### Backend (PHP)
-
-- PHP é usado para processar requisições do cliente e interagir com o banco de dados.
-- As operações de banco de dados são realizadas usando MySQLi.
-- Os dados são retornados em formato JSON para fácil manipulação no frontend.
-
-### Segurança
-
-- Todas as entradas do usuário são escapadas para prevenir injeção de SQL.
-- As senhas e informações sensíveis do banco de dados devem ser protegidas em um ambiente de produção.
+- Proteção contra injeção SQL usando mysqli_real_escape_string
+- Validação de dados no frontend e backend
+- Sanitização de saída HTML
+- Tratamento de erros e exceções
 
 ## Melhorias Futuras
 
-- Implementar autenticação de usuários
-- Adicionar funcionalidade de edição de tarefas
-- Implementar filtros e busca de tarefas
-- Adicionar data de vencimento às tarefas
-- Implementar notificações para tarefas próximas do vencimento
+- [ ] Implementar autenticação de usuários
+- [ ] Adicionar sistema de tags/etiquetas
+- [ ] Implementar filtros e busca de tarefas
+- [ ] Adicionar gráficos e relatórios
+- [ ] Implementar sistema de backup automático
+- [ ] Adicionar temas claro/escuro
+- [ ] Integrar com serviços de notificação externos
+- [ ] Adicionar suporte para anexos
